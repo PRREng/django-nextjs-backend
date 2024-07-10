@@ -14,6 +14,7 @@ class ClienteListSchema(Schema):
     # ClienteOut
     id: UUID
     nome: str
+    criadoem: datetime
 
 class ClienteDetailSchema(Schema):
     # GET -> Data
