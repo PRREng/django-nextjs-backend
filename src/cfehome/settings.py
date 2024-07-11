@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'ninja_jwt',
     # internal
     'clientes',
+    'ucs',
 ]
 
 MIDDLEWARE = [
