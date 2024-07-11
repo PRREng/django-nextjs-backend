@@ -7,6 +7,9 @@ class ClienteCreateSchema(Schema):
     # Create -> Data
     # ClienteIn
     nome: str
+    ddd: str
+    telefone:str
+    cpf:str
 
 
 class ClienteListSchema(Schema):
