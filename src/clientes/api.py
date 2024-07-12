@@ -29,6 +29,7 @@ def create_cliente(request, data:ClienteCreateSchema):
     obj.save()
     return obj
 
+# api/clientes/{client_id}
 @router.get("{client_id}/", response=ClienteDetailSchema, auth=JWTAuth())
 def get_cliente(request, client_id:str):
     obj = get_object_or_404(Cliente, id=client_id)
