@@ -3,6 +3,8 @@ from ninja import Router
 
 from ninja_jwt.authentication import JWTAuth
 from django.shortcuts import get_object_or_404
+
+from .forms import ClienteCreateForm
 from .models import Cliente
 from .schemas import ClienteListSchema, ClienteDetailSchema, ClienteCreateSchema
 
@@ -18,8 +20,13 @@ def list_clientes(request):
 # api/clientes/
 @router.post("", response=ClienteDetailSchema, auth=JWTAuth())
 def create_cliente(request, data:ClienteCreateSchema):
-    print(data)
-    obj = Cliente.objects.create(**data.dict())
+    form = ClienteCreateForm(data.dict())
+    if not form.is_valid:
+        return
+    # cleaned_data = form.cleaned_data
+    # obj = Cliente(**cleaned_data.dict())
+    obj = form.save(commit=False)
+    obj.save()
     return obj
 
 @router.get("{client_id}/", response=ClienteDetailSchema, auth=JWTAuth())
