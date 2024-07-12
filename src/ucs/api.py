@@ -11,10 +11,11 @@ from .schemas import UCDetailSchema, UCListSchema, UCCreateSchema,\
 
 router = Router()
 
-# api/ucs/{categoria:str}
-@router.get("/categoria/{categoria_id}/", response=CategoriaSchema, auth=JWTAuth())
+# api/ucs/categoria/:categoria_id/
+@router.get("categoria/{categoria_id}/", response=CategoriaSchema, auth=JWTAuth())
 def get_categoria(request, categoria_id:int):
     obj = get_object_or_404(Categoria, id=categoria_id)
+    print(f"Fetched categoria successfully: {obj}")
     return obj
 
 # api/ucs/:client_id
@@ -22,6 +23,7 @@ def get_categoria(request, categoria_id:int):
             auth=JWTAuth())
 def list_ucs(request, client_id: str):
     qs = UC.objects.filter(cliente=client_id)
+    print(f"Fetched client successfully: {qs}")
     return qs
 
 # api/ucs/
