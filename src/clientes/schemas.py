@@ -11,6 +11,14 @@ class ClienteCreateSchema(Schema):
     telefone:str
     cpf:str
 
+class ClienteUpdateSchema(Schema):
+    # Create -> Data
+    # ClienteIn
+    nome: str
+    ddd: str
+    telefone:str
+    cpf:str
+
 
 class ClienteListSchema(Schema):
     # List -> Data

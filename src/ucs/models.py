@@ -113,7 +113,7 @@ class ModuloSolar(models.Model):
     
 
 class Projeto(models.Model):
-    uc = models.ForeignKey(UC, on_delete=models.CASCADE)
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     modulo = models.ForeignKey(ModuloSolar, on_delete=models.CASCADE)
     consumoTotal = models.IntegerField()
     qtdeModulos = models.IntegerField()
@@ -122,7 +122,7 @@ class Projeto(models.Model):
     valorProposta = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
-        return f"Projeto da UC: {self.uc.num_UC} no nome do cliente {self.uc.cliente.nome} com consumo de {self.consumoTotal} kwh"
+        return f"Projeto no nome do cliente {self.cliente.nome} com consumo de {self.consumoTotal} kwh"
     
     def isPlural(self):
         return self.qtdeInv > 1

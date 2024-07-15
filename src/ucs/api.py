@@ -10,6 +10,8 @@ from clientes.models import Cliente
 from .schemas import UCDetailSchema, UCListSchema, UCCreateSchema,\
     ProjetoDetailSchema, CategoriaSchema
 
+import helper
+
 router = Router()
 
 # api/ucs/categoria/:categoria_id/
@@ -27,6 +29,7 @@ def list_ucs(request, client_id: str):
     print(f"Fetched client successfully: {qs}")
     return qs
 
+# CREATE UC
 # api/ucs/
 @router.post("", response=UCDetailSchema, auth=JWTAuth())
 def create_uc(request, data:UCCreateSchema):
@@ -43,32 +46,23 @@ def create_uc(request, data:UCCreateSchema):
 
     tipouc = TipoUC.objects.get(nomeTipo=data.nomeTipo)
 
-    print(data.dict())
-    print(data.num_UC)
+    # print(data.dict())
+    # print(data.num_UC)
     obj = UC(num_UC=data.num_UC, cliente=cliente, endereco=endereco,
                         categoria=categoria, tipoUC=tipouc, consumo=data.consumo,
                         tempoPosse=data.tempoPosse, tensaoNominal=data.tensaoNominal,
                         resideoucomercial=data.resideoucomercial)
-    # dataDict = {
-    #     'num_UC': data.num_UC, 'cliente': cliente, 'endereco': endereco,
-    #     'categoria': categoria, 'tipoUC': tipouc, 'consumo': data.consumo,
-    #     'tempoPosse': data.tempoPosse, 'tensaoNominal': data.tensaoNominal,
-    #     'resideoucomercial': data.resideoucomercial
-    # }
-    # form = UCCreateForm(dataDict)
-    # if not form.is_valid:
-    #     return
-    # obj = form.save(commit=False)
+    
     obj.save()
+    # update Projeto
+    update_project(cliente)
     return obj
 
 # api/ucs/:client_id/projeto/
 @router.get("{client_id}/projeto/", response=ProjetoDetailSchema, 
             auth=JWTAuth())
 def get_projeto(request, client_id: str):
-    usina = TipoUC.objects.get(nomeTipo="Usina")
-    qs = UC.objects.filter(cliente=client_id, tipoUC=usina.id)
-    obj = get_object_or_404(Projeto, uc=qs.id)
+    obj = get_object_or_404(Projeto, cliente=client_id)
     return obj
 
 # # api/ucs/:id
@@ -76,3 +70,28 @@ def get_projeto(request, client_id: str):
 # def get_cliente(request, client_id:str):
 #     obj = get_object_or_404(Cliente, id=client_id)
 #     return obj
+
+def update_project(cliente):
+    projeto = Projeto.objects.get(cliente=cliente)
+    # will change
+    # consumoTotal
+    # producaoMedia
+    # qtdeModulos
+    # qtdeInv
+    # valorProposta
+    ucs = UC.objects.filter(cliente=cliente)
+    consumoTotal = 0
+    for uc in ucs:
+        consumoTotal += uc.consumo
+
+    potMod = projeto.modulo.potencia
+    producaoMedia = helper.obter_media_gerada(int(consumoTotal))
+    qtdeModulos = helper.obter_n_mod(int(consumoTotal), potMod)
+    potInv, valorProposta = helper.obter_dimensionamento(qtdeModulos)
+    qtdeInv = len(potInv)
+    projeto.consumoTotal = int(consumoTotal)
+    projeto.producaoMedia = int(producaoMedia)
+    projeto.qtdeModulos = qtdeModulos
+    projeto.qtdeInv = qtdeInv
+    projeto.valorProposta = valorProposta
+    projeto.save()

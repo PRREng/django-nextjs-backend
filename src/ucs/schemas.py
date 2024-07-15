@@ -100,8 +100,14 @@ class ModuloSolarSchema(Schema):
     codInmetro: str
 
 class ProjetoDetailSchema(Schema):
-    id: int
-    uc: UCDetailSchema
+    consumoTotal: int
+    qtdeModulos: int
+    producaoMedia: float
+    qtdeInv: int
+    valorProposta: float
+
+class ProjetoUpdateSchema(Schema):
+    cliente: ClienteDetailSchema
     modulo: ModuloSolarSchema
     consumoTotal: int
     qtdeModulos: int
