@@ -1,5 +1,6 @@
 from ninja import Schema
 from clientes.schemas import ClienteDetailSchema
+from uuid import UUID
 
 
 class EnderecoSchema(Schema):
@@ -37,15 +38,26 @@ class EnderecoCreateSchema(Schema):
 class UCCreateSchema(Schema):
     # Create -> Data
     # ClienteIn
-    num_UC: str
-    cliente: ClienteDetailSchema
-    endereco: EnderecoSchema
-    categoria: CategoriaSchema
-    tipoUC: TipoUCSchema
-    consumo: float
-    tempoPosse: int = 0
+    num_UC: str # CHECK
+    cliente_id: UUID # CHECK
+
+    CEP: str # CHECK
+    prefixo_local: str # CHECK
+    rua: str # CHECK
+    num_logradouro: str # CHECK
+    bairro: str # CHECK
+    cidade: str # CHECK
+    estado: str # CHECK
+    seforrural: bool # CHECK
+
+    nomeCategoria: str # CHECK
+
+    nomeTipo: str # CHECK
+
+    consumo: float # CHECK (as str)
+    tempoPosse: int = None # CHECK
     tensaoNominal: str
-    resideoucomercial: str
+    resideoucomercial: str # CHECK
 
 
 class UCListSchema(Schema):

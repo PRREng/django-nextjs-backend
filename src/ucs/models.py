@@ -78,7 +78,7 @@ class UC(models.Model):
         # Add more choices as needed
     ]
 
-    num_UC = models.CharField(max_length=12)
+    num_UC = models.CharField(max_length=50)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='ucs')
     endereco = models.ForeignKey(Endereco, on_delete=models.CASCADE)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)

@@ -5,7 +5,8 @@ from ninja_jwt.authentication import JWTAuth
 from django.shortcuts import get_object_or_404
 
 from .forms import UCCreateForm
-from .models import UC, TipoUC, Projeto, Categoria
+from .models import UC, TipoUC, Projeto, Categoria, Endereco
+from clientes.models import Cliente
 from .schemas import UCDetailSchema, UCListSchema, UCCreateSchema,\
     ProjetoDetailSchema, CategoriaSchema
 
@@ -29,15 +30,35 @@ def list_ucs(request, client_id: str):
 # api/ucs/
 @router.post("", response=UCDetailSchema, auth=JWTAuth())
 def create_uc(request, data:UCCreateSchema):
-    # cliente: ClienteDetailSchema
-    # endereco: EnderecoSchema
-    # categoria: CategoriaSchema
-    # tipoUC: TipoUCSchema
+    print('GOT in POST method')
+    cliente = Cliente.objects.get(id=data.cliente_id)
+
+    endereco = Endereco(CEP=data.CEP, prefixo_local=data.prefixo_local,
+            rua=data.rua, num_logradouro=data.num_logradouro,
+            bairro=data.bairro, cidade=data.cidade, estado=data.estado,
+            seforrural=data.seforrural)
+    endereco.save()
+    
+    categoria = Categoria.objects.get(nomeCategoria=data.nomeCategoria)
+
+    tipouc = TipoUC.objects.get(nomeTipo=data.nomeTipo)
+
     print(data.dict())
-    form = UCCreateForm(data.dict())
-    if not form.is_valid:
-        return
-    obj = form.save(commit=False)
+    print(data.num_UC)
+    obj = UC(num_UC=data.num_UC, cliente=cliente, endereco=endereco,
+                        categoria=categoria, tipoUC=tipouc, consumo=data.consumo,
+                        tempoPosse=data.tempoPosse, tensaoNominal=data.tensaoNominal,
+                        resideoucomercial=data.resideoucomercial)
+    # dataDict = {
+    #     'num_UC': data.num_UC, 'cliente': cliente, 'endereco': endereco,
+    #     'categoria': categoria, 'tipoUC': tipouc, 'consumo': data.consumo,
+    #     'tempoPosse': data.tempoPosse, 'tensaoNominal': data.tensaoNominal,
+    #     'resideoucomercial': data.resideoucomercial
+    # }
+    # form = UCCreateForm(dataDict)
+    # if not form.is_valid:
+    #     return
+    # obj = form.save(commit=False)
     obj.save()
     return obj
 

@@ -4,10 +4,13 @@ from ninja_jwt.controller import NinjaJWTDefaultController
 from ninja_jwt.authentication import JWTAuth
 from ninja_extra import NinjaExtraAPI
 
+from clientes.api import router as clientes_router
+from ucs.api import router as ucs_router
+
 api = NinjaExtraAPI()
 api.register_controllers(NinjaJWTDefaultController)
-api.add_router("/clientes/", "clientes.api.router")
-api.add_router("/ucs/", "ucs.api.router")
+api.add_router("/clientes/", clientes_router)
+api.add_router("/ucs/", ucs_router)
 
 class UserSchema(Schema):
     username: str

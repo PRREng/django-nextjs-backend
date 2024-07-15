@@ -5,3 +5,4 @@ class UCCreateForm(forms.ModelForm):
     class Meta:
         model = UC
         fields = '__all__'
+        exclude = []
