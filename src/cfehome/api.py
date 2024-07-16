@@ -6,11 +6,13 @@ from ninja_extra import NinjaExtraAPI
 
 from clientes.api import router as clientes_router
 from ucs.api import router as ucs_router
+from projetos.api import router as projetos_router
 
 api = NinjaExtraAPI()
 api.register_controllers(NinjaJWTDefaultController)
 api.add_router("/clientes/", clientes_router)
 api.add_router("/ucs/", ucs_router)
+api.add_router("/projetos/", projetos_router)
 
 class UserSchema(Schema):
     username: str

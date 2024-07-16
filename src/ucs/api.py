@@ -1,5 +1,6 @@
 from typing import List
 from ninja import Router
+# from uuid import UUID
 
 from ninja_jwt.authentication import JWTAuth
 from django.shortcuts import get_object_or_404
@@ -8,22 +9,22 @@ from .forms import UCCreateForm
 from .models import UC, TipoUC, Projeto, Categoria, Endereco
 from clientes.models import Cliente
 from .schemas import UCDetailSchema, UCListSchema, UCCreateSchema,\
-    ProjetoDetailSchema, CategoriaSchema, UCUpdateSchema
+     CategoriaSchema, UCUpdateSchema
 
 import helper
 
 router = Router()
 
-# RETRIEVE CATEGORIA
-# api/ucs/categoria/:categoria_id/
-@router.get("categoria/{categoria_id}/", response=CategoriaSchema, auth=JWTAuth())
-def get_categoria(request, categoria_id:int):
-    obj = get_object_or_404(Categoria, id=categoria_id)
-    print(f"Fetched categoria successfully: {obj}")
-    return obj
+# # RETRIEVE CATEGORIA
+# # api/ucs/categoria/:categoria_id/
+# @router.get("categoria/{categoria_id}/", response=CategoriaSchema, auth=JWTAuth())
+# def get_categoria(request, categoria_id:int):
+#     obj = get_object_or_404(Categoria, id=categoria_id)
+#     print(f"Fetched categoria successfully: {obj}")
+#     return obj
 
 # RETRIEVE UC LIST FROM CLIENT
-# api/ucs/:client_id
+# api/ucs/ -> :client_id
 @router.get("{client_id}/", response=List[UCListSchema], 
             auth=JWTAuth())
 def list_ucs(request, client_id: str):
@@ -66,26 +67,35 @@ def create_uc(request, data:UCCreateSchema):
 
 
 # UPDATE UC FROM CLIENT, It is Update Address at the same time
-# api/ucs/:uc_id
+# /api/ucs/ -> :uc_id/
 @router.put("{uc_id}/")
 def update_uc(request, uc_id: int, data: UCUpdateSchema):
-    obj = get_object_or_404(UC, cliente=data.cliente_id, id=uc_id)
-    print(obj)
-    return obj
+    uc = get_object_or_404(UC, cliente=data.cliente_id, id=uc_id)
+    print("Data to update: ", data.dict())
+    print(uc)
+    # uc.save()
+    return { "success": True }
 
-# RETRIEVE PROJECT FROM CLIENT
-# api/ucs/:client_id/projeto/
-@router.get("{client_id}/projeto/", response=ProjetoDetailSchema, 
+
+# RETRIEVE UC FROM CLIENT
+# /api/ucs/ -> :client_id/:uc_id/
+@router.get("{client_id}/{uc_id}/", response=UCDetailSchema, 
             auth=JWTAuth())
-def get_projeto(request, client_id: str):
-    obj = get_object_or_404(Projeto, cliente=client_id)
-    return obj
+def get_uc(request, client_id: str, uc_id: int):
+    qs = UC.objects.filter(cliente=client_id)
+    uc = qs.filter(id=uc_id).first()
+    print(f"Fetched uc successfully: {uc}")
+    return uc
 
-# # api/ucs/:id
-# @router.get("{client_id}/", response=ClienteDetailSchema, auth=JWTAuth())
-# def get_cliente(request, client_id:str):
-#     obj = get_object_or_404(Cliente, id=client_id)
-#     return obj
+
+# DELETE UC FROM CLIENT
+# api/ucs/ -> {client_id}/{uc_id}/
+@router.delete("{client_id}/{uc_id}/")
+def delete_uc(request, client_id: str, uc_id: int):
+    uc = get_object_or_404(UC, cliente=client_id, id=uc_id)
+    uc.delete()
+    return
+
 
 
 # HELper function

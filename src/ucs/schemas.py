@@ -61,8 +61,8 @@ class UCCreateSchema(Schema):
 
 class UCUpdateSchema(Schema):
     # Update -> Data
-    num_UC: str 
-    cliente_id: UUID 
+    num_UC: str
+    cliente_id: UUID
 
     CEP: str
     prefixo_local: str
@@ -121,19 +121,3 @@ class ModuloSolarSchema(Schema):
     peso: float
     garantiaAno: int
     codInmetro: str
-
-class ProjetoDetailSchema(Schema):
-    consumoTotal: int
-    qtdeModulos: int
-    producaoMedia: float
-    qtdeInv: int
-    valorProposta: float
-
-class ProjetoUpdateSchema(Schema):
-    cliente: ClienteDetailSchema
-    modulo: ModuloSolarSchema
-    consumoTotal: int
-    qtdeModulos: int
-    producaoMedia: float
-    qtdeInv: int
-    valorProposta: float

@@ -1,6 +1,6 @@
 from typing import List
 from ninja import Router
-# from uuid import UUID
+from uuid import UUID
 
 from ninja_jwt.authentication import JWTAuth
 from django.shortcuts import get_object_or_404
@@ -69,7 +69,7 @@ def update_client(request, client_id: str, data: ClienteUpdateSchema):
 # DELETE CLIENT
 # api/clientes/{client_id}
 @router.delete("{client_id}/")
-def delete_client(request, client_id: int):
+def delete_client(request, client_id: UUID):
     cliente = get_object_or_404(Cliente, id=client_id)
     cliente.delete()
     return {"success": True}
