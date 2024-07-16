@@ -8,12 +8,13 @@ from .forms import UCCreateForm
 from .models import UC, TipoUC, Projeto, Categoria, Endereco
 from clientes.models import Cliente
 from .schemas import UCDetailSchema, UCListSchema, UCCreateSchema,\
-    ProjetoDetailSchema, CategoriaSchema
+    ProjetoDetailSchema, CategoriaSchema, UCUpdateSchema
 
 import helper
 
 router = Router()
 
+# RETRIEVE CATEGORIA
 # api/ucs/categoria/:categoria_id/
 @router.get("categoria/{categoria_id}/", response=CategoriaSchema, auth=JWTAuth())
 def get_categoria(request, categoria_id:int):
@@ -21,6 +22,7 @@ def get_categoria(request, categoria_id:int):
     print(f"Fetched categoria successfully: {obj}")
     return obj
 
+# RETRIEVE UC LIST FROM CLIENT
 # api/ucs/:client_id
 @router.get("{client_id}/", response=List[UCListSchema], 
             auth=JWTAuth())
@@ -28,6 +30,7 @@ def list_ucs(request, client_id: str):
     qs = UC.objects.filter(cliente=client_id)
     print(f"Fetched client successfully: {qs}")
     return qs
+
 
 # CREATE UC
 # api/ucs/
@@ -53,11 +56,24 @@ def create_uc(request, data:UCCreateSchema):
                         tempoPosse=data.tempoPosse, tensaoNominal=data.tensaoNominal,
                         resideoucomercial=data.resideoucomercial)
     
-    obj.save()
-    # update Projeto
-    update_project(cliente)
+    try:
+        obj.save()
+        # update Projeto
+        update_project(cliente)
+    except:
+        raise Exception("Could't update project or create uc")
     return obj
 
+
+# UPDATE UC FROM CLIENT, It is Update Address at the same time
+# api/ucs/:uc_id
+@router.put("{uc_id}/")
+def update_uc(request, uc_id: int, data: UCUpdateSchema):
+    obj = get_object_or_404(UC, cliente=data.cliente_id, id=uc_id)
+    print(obj)
+    return obj
+
+# RETRIEVE PROJECT FROM CLIENT
 # api/ucs/:client_id/projeto/
 @router.get("{client_id}/projeto/", response=ProjetoDetailSchema, 
             auth=JWTAuth())
@@ -71,6 +87,8 @@ def get_projeto(request, client_id: str):
 #     obj = get_object_or_404(Cliente, id=client_id)
 #     return obj
 
+
+# HELper function
 def update_project(cliente):
     projeto = Projeto.objects.get(cliente=cliente)
     # will change

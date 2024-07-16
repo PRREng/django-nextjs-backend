@@ -59,6 +59,29 @@ class UCCreateSchema(Schema):
     tensaoNominal: str
     resideoucomercial: str # CHECK
 
+class UCUpdateSchema(Schema):
+    # Update -> Data
+    num_UC: str 
+    cliente_id: UUID 
+
+    CEP: str
+    prefixo_local: str
+    rua: str
+    num_logradouro: str
+    bairro: str
+    cidade: str
+    estado: str
+    seforrural: bool
+
+    nomeCategoria: str
+
+    nomeTipo: str
+
+    consumo: float
+    tempoPosse: int = None
+    tensaoNominal: str
+    resideoucomercial: str
+
 
 class UCListSchema(Schema):
     # List -> Data
@@ -76,7 +99,7 @@ class UCListSchema(Schema):
 
 class UCDetailSchema(Schema):
     # GET -> Data
-    # ClienteOut
+    # UCout
     id: int
     num_UC: str
     cliente: ClienteDetailSchema

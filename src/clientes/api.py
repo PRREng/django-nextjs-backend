@@ -30,12 +30,18 @@ def create_cliente(request, data:ClienteCreateSchema):
         return
 
     obj = form.save(commit=False)
-    obj.save()
-    modulo = ModuloSolar.objects.first()
+    try:
+        modulo = ModuloSolar.objects.first()
+    except:
+        raise Exception("There must be a solar panel in the database beforehand")
 
     projeto = Projeto(cliente=obj, modulo=modulo, consumoTotal=0, qtdeModulos=0, producaoMedia=0,
                       qtdeInv=0, valorProposta=0)
-    projeto.save()
+    try:
+        obj.save()
+        projeto.save()
+    except:
+        raise Exception("Couldn't save project and client")
     return obj
 
 # RETRIEVE
@@ -52,6 +58,7 @@ def get_cliente(request, client_id:str):
 def update_client(request, client_id: str, data: ClienteUpdateSchema):
     cliente = get_object_or_404(Cliente, id=client_id)
     # destructuring in python, only update the informed fields
+    print("Data to update: ", data.dict())
     for attr, value in data.dict().items():
         setattr(cliente, attr, value)
     print(cliente)
