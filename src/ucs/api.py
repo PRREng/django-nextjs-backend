@@ -67,13 +67,41 @@ def create_uc(request, data:UCCreateSchema):
 
 
 # UPDATE UC FROM CLIENT, It is Update Address at the same time
-# /api/ucs/ -> :uc_id/
-@router.put("{uc_id}/")
-def update_uc(request, uc_id: int, data: UCUpdateSchema):
-    uc = get_object_or_404(UC, cliente=data.cliente_id, id=uc_id)
-    print("Data to update: ", data.dict())
-    print(uc)
-    # uc.save()
+# /api/ucs/ -> :client_id/:uc_id/
+@router.put("{client_id}/{uc_id}/")
+def update_uc(request, client_id: str, uc_id: int, data: UCUpdateSchema):
+    uc = get_object_or_404(UC, cliente=client_id, id=uc_id)
+    # print("Data to update: ", data.dict())
+    # print(uc)
+    # we need to update not only the uc, but the address too
+    endereco = uc.endereco
+    endereco.CEP = data.CEP
+    endereco.prefixo_local = data.prefixo_local
+    endereco.rua = data.rua
+    endereco.num_logradouro = data.num_logradouro
+    endereco.bairro = data.bairro
+    endereco.cidade = data.cidade
+    endereco.estado = data.estado
+    endereco.seforrural = data.seforrural
+
+    # update other fields
+    uc.num_UC = data.num_UC
+    uc.categoria = Categoria.objects.get(nomeCategoria=data.nomeCategoria)
+    uc.tipoUC = TipoUC.objects.get(nomeTipo=data.nomeTipo)
+    uc.consumo = data.consumo
+    uc.tempoPosse = data.tempoPosse
+    uc.tensaoNominal = data.tensaoNominal
+    uc.resideoucomercial = data.resideoucomercial
+
+
+    try:
+        endereco.save()
+        uc.save()
+        # update Projeto
+        update_project(client_id)
+        # print("Updated successfully")
+    except:
+        raise Exception("Couldn't save the update")
     return { "success": True }
 
 
@@ -92,9 +120,18 @@ def get_uc(request, client_id: str, uc_id: int):
 # api/ucs/ -> {client_id}/{uc_id}/
 @router.delete("{client_id}/{uc_id}/")
 def delete_uc(request, client_id: str, uc_id: int):
+    # get the uc to be deleted
     uc = get_object_or_404(UC, cliente=client_id, id=uc_id)
-    uc.delete()
-    return
+    # delete the address
+    endereco = uc.endereco
+    try:
+        endereco.delete()
+        uc.delete()
+        # update projeto
+        update_project(client_id)
+    except:
+        Exception("There was an error trying to delete UC")
+    return { "success": True }
 
 
 
