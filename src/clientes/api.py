@@ -4,12 +4,15 @@ from uuid import UUID
 
 from ninja_jwt.authentication import JWTAuth
 from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
 
 from .forms import ClienteCreateForm
 from .models import Cliente
-from ucs.models import Projeto, ModuloSolar
+from ucs.models import Projeto, ModuloSolar, UC, TipoUC
 from .schemas import ClienteListSchema, ClienteDetailSchema, ClienteCreateSchema, \
     ClienteUpdateSchema
+
+import helper
 
 router = Router()
 
@@ -20,6 +23,22 @@ router = Router()
 def list_clientes(request):
     qs = Cliente.objects.all()
     return qs
+
+# GERAR PROPOSTA
+# api/clientes/ -> {client_id}/gerar_simples/
+@router.get("{client_id}/gerar_simples/", auth=JWTAuth())
+def gerar_proposta_simples(request, client_id: str):
+    projeto = get_object_or_404(Projeto, cliente=client_id)
+    usina = get_object_or_404(TipoUC, nomeTipo="Usina")
+    uc = get_object_or_404(UC, cliente=client_id, tipoUC=usina)
+    filename = f"Proposta - {projeto.cliente.nome}"
+    pptx_io = helper.gerar_PPTX(uc, projeto)
+    response = HttpResponse(
+        pptx_io.read(),
+        content_type="application/vnd.ms-powerpoint"
+    )
+    response["Content-Disposition"] = f'attachment; filename="{filename}.pptx"'
+    return response
 
 # CREATE
 # api/clientes/
@@ -71,5 +90,10 @@ def update_client(request, client_id: str, data: ClienteUpdateSchema):
 @router.delete("{client_id}/")
 def delete_client(request, client_id: UUID):
     cliente = get_object_or_404(Cliente, id=client_id)
+    ucs = UC.objects.filter(cliente=cliente)
+    for uc in ucs:
+        endereco = uc.endereco
+        endereco.delete()
+
     cliente.delete()
     return {"success": True}

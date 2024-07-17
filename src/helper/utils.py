@@ -1,32 +1,32 @@
 from math import floor, ceil
-import numpy as np
+from typing import List
 
 
 tabela = {
-    4: [3, 9900],
-    5: [3, 11900],
-    6: [3, 12900],
-    7: [3, 13900],
-    8: [5, 15900],
-    9: [5, 16900],
-    10: [5, 17900],
-    11: [5, 18900],
-    12: [5, 19900],
-    13: [6, 20900],
-    14: [6, 21900],
-    15: [8, 22900],
-    16: [8, 23900],
-    17: [8, 24900],
-    18: [8, 25900],
-    19: [8, 26900],
-    20: [8, 27900],
-    21: [10, 32900],
-    22: [10, 33900],
-    23: [10, 34900],
-    24: [10, 35900],
-    25: [10, 36900],
-    26: [10, 37900],
-    27: [10, 38900],
+    4: [3, 8900],
+    5: [3, 9900],
+    6: [3, 10900],
+    7: [3, 11900],
+    8: [5, 13900],
+    9: [5, 14900],
+    10: [5, 15900],
+    11: [5, 16900],
+    12: [5, 18900],
+    13: [6, 19900],
+    14: [6, 20900],
+    15: [6, 21900],
+    16: [8, 22900],
+    17: [8, 23900],
+    18: [8, 24900],
+    19: [8, 25900],
+    20: [8, 26900],
+    21: [10, 28900],
+    22: [10, 29900],
+    23: [10, 30900],
+    24: [10, 31900],
+    25: [10, 32900],
+    26: [10, 33900],
+    27: [10, 34900],
 }
 
 
@@ -82,15 +82,21 @@ def obter_pot_sist(consumo_medio: int) -> float:
 
 def obter_media_gerada(consumo_medio: int) -> float:
     '''Retorna a energia gerada média ao longo do ano em kWh'''
-    energia_gerada = obter_geracao(consumo_medio)
+    energia_gerada = obter_geracao(consumo=consumo_medio)
+    return mean_energy(energia_gerada)
 
+def obter_media_gerada_por_n(qtdeMod: int, potencia_mod: int) -> float:
+    pot_sist = (qtdeMod * potencia_mod) / 1000
+    energia_gerada = obter_geracao(p_sist=pot_sist)
+    return mean_energy(energia_gerada)
+
+
+def mean_energy(energia_gerada: List[int]) -> float:
     energia_gerada_media = sum(energia_gerada) / len(energia_gerada)
-
-    return energia_gerada_media
-
+    return round(energia_gerada_media, 2)
 
 
-def calcular_payback(media_gerada_kwh: float, investimento: int) -> list[int]:
+def calcular_payback(media_gerada_kwh: float, investimento: int) -> List[int]:
     '''Retorna o payback em uma lista com quantidade de anos e meses'''
     if investimento == 0:
         return [0, 0]
@@ -104,10 +110,10 @@ def calcular_payback(media_gerada_kwh: float, investimento: int) -> list[int]:
     return [anos, meses]
 
 
-def obter_geracao(consumo: int) -> list[int]:
+def obter_geracao(consumo: int=0, p_sist:int = 0) -> List[int]:
     '''Função que obtém uma lista de geração ao longo do ano'''
-
-    p_sist = obter_pot_sist(consumo)
+    if p_sist == 0:
+        p_sist = obter_pot_sist(consumo)
     geracao = [0 for _ in range(12)]
     # E = irrad_inst * p_sist * 30 * 0.8
     for i in range(12):

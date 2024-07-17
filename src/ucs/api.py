@@ -68,7 +68,7 @@ def create_uc(request, data:UCCreateSchema):
 
 # UPDATE UC FROM CLIENT, It is Update Address at the same time
 # /api/ucs/ -> :client_id/:uc_id/
-@router.put("{client_id}/{uc_id}/")
+@router.put("{client_id}/{uc_id}/", auth=JWTAuth())
 def update_uc(request, client_id: str, uc_id: int, data: UCUpdateSchema):
     uc = get_object_or_404(UC, cliente=client_id, id=uc_id)
     # print("Data to update: ", data.dict())
@@ -118,7 +118,7 @@ def get_uc(request, client_id: str, uc_id: int):
 
 # DELETE UC FROM CLIENT
 # api/ucs/ -> {client_id}/{uc_id}/
-@router.delete("{client_id}/{uc_id}/")
+@router.delete("{client_id}/{uc_id}/", auth=JWTAuth())
 def delete_uc(request, client_id: str, uc_id: int):
     # get the uc to be deleted
     uc = get_object_or_404(UC, cliente=client_id, id=uc_id)
