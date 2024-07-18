@@ -24,7 +24,7 @@ def list_clientes(request):
     qs = Cliente.objects.all()
     return qs
 
-# GERAR PROPOSTA
+# GERAR PROPOSTA SIMPLES
 # api/clientes/ -> {client_id}/gerar_simples/
 @router.get("{client_id}/gerar_simples/", auth=JWTAuth())
 def gerar_proposta_simples(request, client_id: str):
@@ -39,6 +39,70 @@ def gerar_proposta_simples(request, client_id: str):
     )
     response["Content-Disposition"] = f'attachment; filename="{filename}.pptx"'
     return response
+
+# GERAR PROPOSTA GRANDE
+# api/clientes/ -> {client_id}/gerar_grande/
+@router.get("{client_id}/gerar_grande/", auth=JWTAuth())
+def gerar_proposta_grande(request, client_id: str):
+    projeto = get_object_or_404(Projeto, cliente=client_id)
+    usina = get_object_or_404(TipoUC, nomeTipo="Usina")
+    uc = get_object_or_404(UC, cliente=client_id, tipoUC=usina)
+    filename = f"Proposta - {projeto.cliente.nome}"
+    pptx_io = helper.gerarGrandePptx(uc, projeto)
+    response = HttpResponse(
+        pptx_io.read(),
+        content_type="application/vnd.ms-powerpoint"
+    )
+    response["Content-Disposition"] = f'attachment; filename="{filename}.pptx"'
+    return response
+
+# GERAR PROCURAÇÃO
+# api/clientes/ -> {client_id}/procuracao/
+@router.get("{client_id}/procuracao/", auth=JWTAuth())
+def gerar_procuracao(request, client_id: str):
+    usina = get_object_or_404(TipoUC, nomeTipo="Usina")
+    uc = get_object_or_404(UC, cliente=client_id, tipoUC=usina)
+    filename = f"Procuração"
+    docx_io = helper.makeprocuracao(uc)
+    response = HttpResponse(
+        docx_io.read(),
+        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+    response["Content-Disposition"] = f'attachment; filename="{filename}.docx"'
+    return response
+
+
+# GERAR TERMO DE POSSE
+# api/clientes/ -> {client_id}/termo-de-posse/
+@router.get("{client_id}/termo-de-posse/", auth=JWTAuth())
+def gerar_termo_de_posse(request, client_id: str):
+    usina = get_object_or_404(TipoUC, nomeTipo="Usina")
+    uc = get_object_or_404(UC, cliente=client_id, tipoUC=usina)
+    filename = f"Termo de Posse"
+    docx_io = helper.makePosse(uc)
+    response = HttpResponse(
+        docx_io.read(),
+        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+    response["Content-Disposition"] = f'attachment; filename="{filename}.docx"'
+    return response
+
+# GERAR CONTRATO
+# api/clientes/ -> {client_id}/contrato/
+@router.get("{client_id}/contrato/", auth=JWTAuth())
+def gerar_contrato(request, client_id: str):
+    projeto = get_object_or_404(Projeto, cliente=client_id)
+    usina = get_object_or_404(TipoUC, nomeTipo="Usina")
+    uc = get_object_or_404(UC, cliente=client_id, tipoUC=usina)
+    filename = f"Contrato"
+    docx_io = helper.makeContrato(uc, projeto)
+    response = HttpResponse(
+        docx_io.read(),
+        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+    response["Content-Disposition"] = f'attachment; filename="{filename}.docx"'
+    return response
+
 
 # CREATE
 # api/clientes/

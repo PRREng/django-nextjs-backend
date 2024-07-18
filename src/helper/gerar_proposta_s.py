@@ -2,6 +2,7 @@ import pptx
 from datetime import datetime
 from clientes.models import Cliente
 from ucs.models import ModuloSolar, Projeto, UC, Endereco, Categoria, TipoUC
+from .format_functions import numberFormatter
 from .utils import obter_dados, obter_dimensionamento, calcular_payback
 from .gerar_utils import update_text_of_textbox, update_text_of_table, update_image, update_chart, formatar_payback
 import io
@@ -80,6 +81,7 @@ def gerar_PPTX(uc: UC, projeto:Projeto):
     # NOME E DATA NO TEXT_BOX 1
     modulo = projeto.modulo
     cliente = uc.cliente
+    investimento = int(projeto.valorProposta)
     nome = cliente.nome.upper() # parametro
     data = datetime.today().strftime('%d/%m/%Y')
     nome_data_text = f"""{nome}
@@ -111,7 +113,7 @@ def gerar_PPTX(uc: UC, projeto:Projeto):
     update_text_of_table(PRESENTATION, 2, 1, 2, marcasModulo_text)
 
     # Tabela 1 => ID 4
-    potMod = modulo.potencia
+    potMod = int(modulo.potencia)
     potMod_text = f"{potMod} Wp"
 
     update_text_of_table(PRESENTATION, 2, 1, 4, potMod_text)
@@ -122,7 +124,7 @@ def gerar_PPTX(uc: UC, projeto:Projeto):
     update_text_of_table(PRESENTATION, 2, 1, 6, qtde_text)
 
     # Tabela 1 => ID 8
-    peso_Mod = modulo.peso
+    peso_Mod = numberFormatter(modulo.peso)
     peso_Mod_text = f"{peso_Mod} kg"
 
     update_text_of_table(PRESENTATION, 2, 1, 8, peso_Mod_text)
@@ -150,7 +152,7 @@ def gerar_PPTX(uc: UC, projeto:Projeto):
     update_text_of_table(PRESENTATION, 2, 2, 2, marcasInv_text)
 
     # Tabela 2 => ID 4
-    pot_inv, investimento = obter_dimensionamento(projeto.qtdeModulos) # SET IT AS 1 FOR NOW
+    pot_inv, _ = obter_dimensionamento(projeto.qtdeModulos) # SET IT AS 1 FOR NOW
     pot_text = ""
     for idx, inv in enumerate(pot_inv, 1):
         pot_text += str(inv) + ' kW'
@@ -192,7 +194,7 @@ def gerar_PPTX(uc: UC, projeto:Projeto):
     # PROD_MED NO TEXT_BOX 6  (check)
     # GRÁFICO EM IMAGEM A SER COLOCADO
 
-    pot_mod = qtde_mod * potMod / 1000
+    pot_mod = int(qtde_mod) * int(modulo.potencia) / 1000
     pot_mod_formatado = "{:,.2f}".format(pot_mod).replace('.', ',')
     cidade = uc.endereco.cidade
     estado = uc.endereco.estado
@@ -200,7 +202,7 @@ def gerar_PPTX(uc: UC, projeto:Projeto):
 
     update_text_of_textbox(PRESENTATION, 3, 3, pot_cidade_estado_text)
 
-    prod_media = projeto.producaoMedia
+    prod_media = numberFormatter(projeto.producaoMedia)
     prod_med_text = f"""Produção média
     mensal de energia:
     {prod_media} kWh"""
@@ -221,7 +223,7 @@ def gerar_PPTX(uc: UC, projeto:Projeto):
     proposta_text = f" {proposta_formatada}"
     update_text_of_textbox(PRESENTATION, 4, 26, proposta_text)
 
-    anos, meses = calcular_payback(float(projeto.producaoMedia), int(investimento)) # parametro
+    anos, meses = calcular_payback(float(projeto.producaoMedia), investimento) # parametro
 
     payback_formatado = formatar_payback(anos, meses)
 
