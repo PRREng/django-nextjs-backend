@@ -1,6 +1,7 @@
 
 import datetime
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -10,12 +11,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-s92_r+5fy_fg%s%@)80gso4d=g0(i#x$har6b(f&)m^es6(!k9'
+SECRET_KEY = config("DJANGO_SECRET_KEY", cast=str)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DJANGO_DEBUG", cast=bool, default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -52,10 +53,11 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'cfehome.urls'
 
 CORS_URLS_REGEX = r"^/api/.*$"
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:3000", # nextjs
-    "http://localhost:3000", # nextjs
-]
+CORS_ALLOWED_ORIGINS = []
+ENV_CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=str, default="")
+for origin in ENV_CORS_ALLOWED_ORIGINS.split(','):
+    CORS_ALLOWED_ORIGINS.append(f"{origin}".strip().lower())
+
 
 TEMPLATES = [
     {
