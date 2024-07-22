@@ -20,8 +20,10 @@ DEBUG = config("DJANGO_DEBUG", cast=bool, default=False)
 ALLOWED_HOSTS = ["*", ".vercel.app"]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://*.vercel.app",
-    "https://*.vercel.app",
+    "http://backend-django-ocnrngbyd-prrengs-projects.vercel.app",
+    "https://backend-django-ocnrngbyd-prrengs-projects.vercel.app",
+    "http://backend-django-api.vercel.app/",
+    "https://backend-django-api.vercel.app/",
 ]
 
 
