@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'cfehome.wsgi.app'
 DATABASES = {
     'default': dj_database_url.parse(
         config("DATABASE_URL", cast=str),
-        conn_max_age=200,
+        conn_max_age=1,
         conn_health_checks=True,
     )
 }
