@@ -1,11 +1,11 @@
 {
     "builds": [{
-        "src": "src/cfehome/wsgi.py",
+        "src": "cfehome/wsgi.py",
         "use": "@vercel/python",
         "config": { "maxLambdaSize": "15mb", "runtime": "python3.12" }
     }],
     "routes": [{
-        "src": "src/(.*)",
-        "dest": "src/cfehome/wsgi.py"
+        "src": "/(.*)",
+        "dest": "cfehome/wsgi.py"
     }]
 }
