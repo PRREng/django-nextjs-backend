@@ -17,7 +17,7 @@ SECRET_KEY = config("DJANGO_SECRET_KEY", cast=str)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DJANGO_DEBUG", cast=bool, default=False)
 
-ALLOWED_HOSTS = [".vercel.app"]
+ALLOWED_HOSTS = ["*", ".vercel.app"]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://*.vercel.app",
