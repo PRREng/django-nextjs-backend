@@ -94,6 +94,7 @@ DATABASES = {
         config("DATABASE_URL", cast=str),
         conn_max_age=None,
         conn_health_checks=True,
+        disable_server_side_cursors=True
     )
 }
 
